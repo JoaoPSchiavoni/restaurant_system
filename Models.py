@@ -15,9 +15,9 @@ class User(Base):
 
     id = Column("id", Integer, primary_key=True, autoincrement=True)
     name = Column("name", String)
-    email = Column("email", String, nullable=False)
-    password = Column("password", String)
-    active = Column("active", Boolean)
+    email = Column("email", String, nullable=False, unique=True)
+    password = Column("password", String, nullable=False)
+    active = Column("active", Boolean, default=True)
     admin = Column("admin", Boolean, default=False)
 
     def __init__(self, name, email, password, active=True, admin=False):
@@ -28,7 +28,7 @@ class User(Base):
         self.admin = admin
 
 
-class order(Base):
+class Order(Base):
     __tablename__ = "orders"
 
     # ORDER_STATUS = (
@@ -38,11 +38,11 @@ class order(Base):
     # )
     id = Column("id", Integer, primary_key=True, autoincrement=True)
     status = Column("status", String) 
-    user = Column("user", ForeignKey("users.id"))
+    user_id = Column("user", ForeignKey("users.id"))
     price = Column("price", Float)
     # items = 
 
-    def __init__(self, user, status="PENDENTE", price=0):
+    def __init__(self, user, status="PENDENTE", price=0.0):
         self.user = user
         self.status = status
         self.price = price
@@ -51,7 +51,6 @@ class order(Base):
 class OrderItem(Base):
     __tablename__ = "order_item"
 
-    
     id = Column("id", Integer, primary_key=True, autoincrement=True)
     amount = Column("amout", Integer)
     flavor = Column("flavor", String)
