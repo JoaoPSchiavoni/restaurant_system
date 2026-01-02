@@ -6,9 +6,17 @@ from schemas import SchemaUser, LoginSchema
 from sqlalchemy.orm import Session
 auth_router = APIRouter(prefix="/auth", tags=["auth"])
 
-def create_token(user_id):
+def create_token(user_id): 
     token = f"h6MDWu8p1Bhku6jgI2Byr{user_id}"
     return token
+
+def authenticate_user(email, password, session):
+    user = session.query(User).filter(User.email==email).first()
+    if not user:
+        return False
+    elif not bcrypt_context.verify(password, user.password):
+        return False
+    return user
 
 @auth_router.get("/")
 async def home():
@@ -40,9 +48,9 @@ async def create_account(schema_user: SchemaUser,session: Session = Depends(get_
 
 @auth_router.post("/login")
 async def login(login_schema: LoginSchema, session: Session = Depends(get_session)):
-    user = session.query(User).filter(User.email==login_schema.email).first()
+    user = authenticate_user(login_schema.email, login_schema.password, session)
     if not user:
-        raise HTTPException(status_code=400, detail="User not found")
+        raise HTTPException(status_code=400, detail="User not foun or invalid credentials")
     else:
         access_token = create_token(user.id)
         return {
