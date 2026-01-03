@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 from models import User
-from dependencies import get_session
+from dependencies import get_session, validate_token
 from main import bcrypt_context, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES, SECRET_KEY
 from schemas import SchemaUser, LoginSchema
 from sqlalchemy.orm import Session
@@ -10,9 +10,9 @@ from datetime import datetime, timedelta, timezone
 
 auth_router = APIRouter(prefix="/auth", tags=["auth"])
 
-def create_token(user_id, token_duration = ACCESS_TOKEN_EXPIRE_MINUTES):
-    expire_data = datetime.now(timezone.utc) + timedelta(minutes=token_duration)
-    dict_info = {"sub": user_id,
+def create_token(user_id, token_duration = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)):
+    expire_data = datetime.now(timezone.utc) + token_duration
+    dict_info = {"sub": str(user_id),
                  "exp": expire_data}
     encoded_jwt = jwt.encode(dict_info, SECRET_KEY, ALGORITHM)
     return encoded_jwt
@@ -25,10 +25,6 @@ def authenticate_user(email, password, session):
         return False
     return user
 
-def validate_token(token, session: Session = Depends(get_session)):
-
-    user = session.query(User).filter(id==1).first()
-    return user
 
 @auth_router.get("/")
 async def home():
@@ -65,7 +61,7 @@ async def login(login_schema: LoginSchema, session: Session = Depends(get_sessio
         raise HTTPException(status_code=400, detail="User not found or invalid credentials")
     else:
         access_token = create_token(user.id)
-        refresh_token = create_token(user.id, token_duration=timedelta(days=2))
+        refresh_token = create_token(user.id, token_duration=timedelta(days=7))
         return {
             "access_token": access_token,
             "refresh_token": refresh_token,
@@ -73,8 +69,7 @@ async def login(login_schema: LoginSchema, session: Session = Depends(get_sessio
             }
 
 @auth_router.get("/refresh")
-async def use_refresh_token(token):
-    user = validate_token(token)
+async def use_refresh_token(user: User = Depends(validate_token) ):
     access_token = create_token(user.id)
     return {
             "access_token": access_token,
