@@ -42,8 +42,8 @@ class Order(Base):
     price = Column("price", Float)
     # items = 
 
-    def __init__(self, user, status="PENDENTE", price=0.0):
-        self.user = user
+    def __init__(self, user_id, status="PENDING", price=0.0):
+        self.user_id = user_id
         self.status = status
         self.price = price
 
