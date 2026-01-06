@@ -4,6 +4,8 @@ from sqlalchemy.orm import sessionmaker, Session
 from models import User
 from jose import jwt, JWTError
 from main import SECRET_KEY, ALGORITHM, oauth2_schema
+
+
 def get_session():
     try:
         Session = sessionmaker(bind=db)
