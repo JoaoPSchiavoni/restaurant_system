@@ -1,4 +1,6 @@
 #Para rodar o Codigo basta excutar no terminal: uvicorn main:app --reload
+#criar migracao: alembic revision --autogenerate -m "message"
+#executa a migracao: alembic upgrade head
 from fastapi import FastAPI
 from passlib.context import CryptContext
 from fastapi.security import OAuth2PasswordBearer

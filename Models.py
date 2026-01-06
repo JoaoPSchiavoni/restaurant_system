@@ -1,5 +1,5 @@
 from sqlalchemy import create_engine, Column, String, Integer, Float, Boolean, ForeignKey
-from sqlalchemy.orm import declarative_base
+from sqlalchemy.orm import declarative_base, relationship
 #from sqlalchemy_utils.types import ChoiceType
 
 #cria a conexao do seu banco
@@ -40,28 +40,31 @@ class Order(Base):
     status = Column("status", String) 
     user_id = Column("user", ForeignKey("users.id"))
     price = Column("price", Float)
-    # items = 
+    items = relationship("OrderItem", cascade="all, delete")
 
     def __init__(self, user_id, status="PENDING", price=0.0):
         self.user_id = user_id
         self.status = status
         self.price = price
 
+    def sum_price(self):
+        
+        self.price = sum(item.unit_price * item.amount for item in self.items)
 
 class OrderItem(Base):
     __tablename__ = "order_item"
 
     id = Column("id", Integer, primary_key=True, autoincrement=True)
-    amount = Column("amout", Integer)
+    amount = Column("amount", Integer)
     flavor = Column("flavor", String)
     size = Column("size", String)
     unit_price = Column("unit_price", Float)
-    order = Column("order", ForeignKey("orders.id"))
+    order_id = Column("order", ForeignKey("orders.id"))
 
     def __init__(self, amount, flavor, size, init_price, order):
         self.amount = amount
         self.flavor = flavor
         self.size = size
-        self.init_price = init_price
-        self.order = order
+        self.unit_price = init_price
+        self.order_id = order
 # executa a criacao dos metadados do banco (cria efetivamente o banco de. dados)
