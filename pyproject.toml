@@ -1,0 +1,33 @@
+[tool.poetry]
+name = "restaurant-system"
+version = "0.1.0"
+description = "Refactored Restaurant System using Clean Architecture and FastAPI"
+authors = ["JoaoPSchiavoni"]
+readme = "README.md"
+packages = [{include = "src"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = "^0.111.0"
+uvicorn = {extras = ["standard"], version = "^0.30.0"}
+sqlalchemy = "^2.0.30"
+alembic = "^1.13.1"
+pydantic = "^2.7.4"
+pydantic-settings = "^2.3.3"
+pyjwt = {extras = ["crypto"], version = "^2.8.0"}
+bcrypt = "^4.1.3"
+python-multipart = "^0.0.9"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.2.2"
+pytest-asyncio = "^0.23.7"
+ruff = "^0.4.9"
+httpx = "^0.27.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.ruff]
+line-length = 88
+select = ["E", "F", "I", "W"]
