@@ -57,7 +57,7 @@ async def cancel_order(
         order = order_use_case.cancel_order(order_id, user)
         return {
             "message": f"Order nº {order.id} was successfully cancelled.",
-            "order": order
+            "order": ResponseOrderSchema.model_validate(order).model_dump()
         }
     except LookupError as e:
         raise HTTPException(status_code=404, detail=str(e))
@@ -85,7 +85,7 @@ async def add_order_item(
         )
         return {
             "message": "Item added successfully",
-            "order": order
+            "order": ResponseOrderSchema.model_validate(order).model_dump()
         }
     except LookupError as e:
         raise HTTPException(status_code=404, detail=str(e))
@@ -105,7 +105,7 @@ async def delete_order_item(
         order = order_use_case.delete_item(item_id, user)
         return {
             "message": "Item deleted successfully",
-            "order": order
+            "order": ResponseOrderSchema.model_validate(order).model_dump()
         }
     except LookupError as e:
         raise HTTPException(status_code=404, detail=str(e))

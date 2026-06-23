@@ -73,7 +73,7 @@ def test_login_form_success(client):
     assert response.status_code == status.HTTP_200_OK
     data = response.json()
     assert "access_token" in data
-    assert "token_type" == "Bearer"
+    assert data["token_type"] == "Bearer"
 
 def test_refresh_token(client):
     register_payload = {

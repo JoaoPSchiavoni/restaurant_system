@@ -22,6 +22,7 @@ class LoginSchema(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 class OrderItemSchema(BaseModel):
+    id: Optional[int] = None
     amount: int
     flavor: str
     size: str

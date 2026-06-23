@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Restaurante Gourmet - Order Management</title>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Background Glows -->
+  <div class="glow-sphere glow-1"></div>
+  <div class="glow-sphere glow-2"></div>
+
+  <!-- Notification Toast Container -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- 1. Authentication View -->
+  <div id="auth-view" class="auth-view-container">
+    <div class="auth-card">
+      <div class="auth-header">
+        <div class="brand-logo">
+          <i class="fa-solid fa-utensils"></i>
+        </div>
+        <h2>Restaurante Gourmet</h2>
+        <p>Faça login ou crie sua conta para gerenciar pedidos</p>
+      </div>
+
+      <div class="auth-tabs">
+        <button id="tab-login" class="tab-btn active" onclick="switchTab('login')">Entrar</button>
+        <button id="tab-register" class="tab-btn" onclick="switchTab('register')">Cadastrar</button>
+      </div>
+
+      <!-- Login Form -->
+      <form id="login-form" class="auth-form active-form" onsubmit="handleLogin(event)">
+        <div class="input-group">
+          <i class="fa-regular fa-envelope input-icon"></i>
+          <input type="email" id="login-email" required placeholder="E-mail">
+          <label for="login-email">E-mail</label>
+        </div>
+        <div class="input-group">
+          <i class="fa-solid fa-lock input-icon"></i>
+          <input type="password" id="login-password" required placeholder="Senha">
+          <label for="login-password">Senha</label>
+        </div>
+        <button type="submit" id="login-btn" class="btn btn-primary btn-block">
+          <span>Acessar Painel</span> <i class="fa-solid fa-arrow-right"></i>
+        </button>
+      </form>
+
+      <!-- Register Form -->
+      <form id="register-form" class="auth-form" onsubmit="handleRegister(event)">
+        <div class="input-group">
+          <i class="fa-regular fa-user input-icon"></i>
+          <input type="text" id="register-name" required placeholder="Nome Completo">
+          <label for="register-name">Nome Completo</label>
+        </div>
+        <div class="input-group">
+          <i class="fa-regular fa-envelope input-icon"></i>
+          <input type="email" id="register-email" required placeholder="E-mail">
+          <label for="register-email">E-mail</label>
+        </div>
+        <div class="input-group">
+          <i class="fa-solid fa-lock input-icon"></i>
+          <input type="password" id="register-password" required placeholder="Senha">
+          <label for="register-password">Senha</label>
+        </div>
+        <div class="checkbox-group">
+          <label class="custom-checkbox">
+            <input type="checkbox" id="register-admin">
+            <span class="checkmark"></span>
+            Registrar como Administrador
+          </label>
+        </div>
+        <button type="submit" id="register-btn" class="btn btn-primary btn-block">
+          <span>Criar Conta</span> <i class="fa-solid fa-user-plus"></i>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- 2. Dashboard View (Hidden by default) -->
+  <div id="dashboard-view" class="dashboard-container" style="display: none;">
+    
+    <!-- Sidebar / Orders List -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-brand">
+          <i class="fa-solid fa-utensils brand-icon"></i>
+          <div class="brand-text">
+            <h1>Gourmet</h1>
+            <span>Painel de Pedidos</span>
+          </div>
+        </div>
+        <button id="logout-btn" class="logout-icon-btn" onclick="handleLogout()" title="Sair">
+          <i class="fa-solid fa-arrow-right-from-bracket"></i>
+        </button>
+      </div>
+
+      <div class="user-profile-section">
+        <div class="user-avatar">
+          <i class="fa-solid fa-circle-user"></i>
+        </div>
+        <div class="user-info">
+          <span class="user-name" id="user-display-name">Usuário</span>
+          <span class="user-role-badge" id="user-display-role">Cliente</span>
+        </div>
+      </div>
+
+      <div class="sidebar-actions">
+        <button id="new-order-btn" class="btn btn-accent btn-block" onclick="createNewOrder()">
+          <i class="fa-solid fa-plus"></i> <span>Novo Pedido</span>
+        </button>
+      </div>
+
+      <div class="orders-list-section">
+        <h3>Seus Pedidos</h3>
+        <div id="orders-list" class="orders-list">
+          <!-- Dynamically populated orders -->
+          <div class="no-orders-state">
+            <i class="fa-regular fa-clipboard"></i>
+            <p>Nenhum pedido criado ainda.</p>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Detail Content Area -->
+    <main class="main-content">
+      
+      <!-- Empty State / Welcome -->
+      <div id="order-empty-state" class="empty-state-card active-state">
+        <div class="empty-state-content">
+          <div class="empty-icon-wrapper animate-bounce">
+            <i class="fa-solid fa-pizza-slice"></i>
+          </div>
+          <h2>Boas-vindas ao Restaurante Gourmet</h2>
+          <p>Selecione um pedido na barra lateral ou crie um novo pedido para começar a adicionar sabores!</p>
+          <button class="btn btn-primary" onclick="createNewOrder()">
+            <i class="fa-solid fa-plus"></i> Criar Primeiro Pedido
+          </button>
+        </div>
+      </div>
+
+      <!-- Order Detail Card (Hidden initially) -->
+      <div id="order-detail-card" class="order-detail-card" style="display: none;">
+        <header class="order-detail-header">
+          <div class="order-title-block">
+            <div class="order-badge">
+              <i class="fa-solid fa-receipt"></i>
+              <span>Pedido #<span id="detail-order-id">00</span></span>
+            </div>
+            <span id="detail-order-status" class="status-badge status-pending">PENDING</span>
+          </div>
+          <div class="order-actions-block">
+            <button id="cancel-order-btn" class="btn btn-danger btn-sm" onclick="cancelCurrentOrder()">
+              <i class="fa-solid fa-ban"></i> Cancelar Pedido
+            </button>
+            <button id="finalize-order-btn" class="btn btn-success btn-sm" onclick="finalizeCurrentOrder()">
+              <i class="fa-solid fa-check-double"></i> Finalizar Pedido
+            </button>
+          </div>
+        </header>
+
+        <section class="order-summary-box">
+          <div class="summary-item">
+            <span class="summary-label">Total do Pedido</span>
+            <span class="summary-value" id="detail-order-price">R$ 0,00</span>
+          </div>
+        </section>
+
+        <!-- Order Items Section -->
+        <section class="order-items-section">
+          <div class="section-title-row">
+            <h3>Itens do Pedido</h3>
+            <button id="open-add-item-btn" class="btn btn-primary btn-sm" onclick="showAddItemForm()">
+              <i class="fa-solid fa-plus"></i> Adicionar Item
+            </button>
+          </div>
+
+          <div class="items-table-container">
+            <table class="items-table">
+              <thead>
+                <tr>
+                  <th>Sabor / Prato</th>
+                  <th>Tamanho</th>
+                  <th class="text-center">Quantidade</th>
+                  <th class="text-right">Preço Unitário</th>
+                  <th class="text-right">Total</th>
+                  <th class="text-center">Ações</th>
+                </tr>
+              </thead>
+              <tbody id="order-items-tbody">
+                <!-- Dynamically populated items -->
+              </tbody>
+            </table>
+            
+            <div id="items-empty-state" class="items-empty-state">
+              <i class="fa-solid fa-basket-shopping"></i>
+              <p>Este pedido ainda não tem itens adicionados.</p>
+              <button class="btn btn-accent btn-sm" onclick="showAddItemForm()">
+                <i class="fa-solid fa-plus"></i> Adicionar Primeiro Item
+              </button>
+            </div>
+          </div>
+        </section>
+      </div>
+
+    </main>
+
+  </div>
+
+  <!-- 3. Add Item Modal -->
+  <div id="add-item-modal" class="modal-overlay">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-cart-plus"></i> Adicionar Item ao Pedido</h3>
+        <button class="modal-close-btn" onclick="hideAddItemForm()">&times;</button>
+      </div>
+      <form id="add-item-form" onsubmit="handleAddOrderItem(event)">
+        <div class="modal-body">
+          <div class="form-grid">
+            <div class="form-group full-width">
+              <label for="item-flavor">Sabor ou Prato</label>
+              <select id="item-flavor" required>
+                <option value="" disabled selected>Escolha um sabor</option>
+                <option value="Margherita">Margherita (Molho, muçarela, tomate, manjericão)</option>
+                <option value="Pepperoni">Pepperoni (Muçarela, pepperoni curado, cebola)</option>
+                <option value="Calabresa">Calabresa (Muçarela, calabresa fatiada, cebola, azeitona)</option>
+                <option value="Frango com Catupiry">Frango com Catupiry (Frango desfiado, catupiry original)</option>
+                <option value="Quatro Queijos">Quatro Queijos (Muçarela, gorgonzola, provolone, parmesão)</option>
+                <option value="Vegetariana">Vegetariana (Abobrinha, berinjela, tomate cereja, rúcula)</option>
+                <option value="Portuguesa">Portuguesa (Presunto, ovos, cebola, ervilha, muçarela)</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label for="item-size">Tamanho</label>
+              <select id="item-size" required onchange="updateEstimatedPrice()">
+                <option value="Pequena">Pequena</option>
+                <option value="Média" selected>Média</option>
+                <option value="Grande">Grande</option>
+                <option value="Família">Família</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="item-amount">Quantidade</label>
+              <input type="number" id="item-amount" min="1" max="20" value="1" required onchange="updateEstimatedPrice()">
+            </div>
+
+            <div class="form-group full-width">
+              <label for="item-price">Preço Unitário (R$)</label>
+              <div class="price-input-wrapper">
+                <span class="price-currency">R$</span>
+                <input type="number" id="item-price" step="0.01" min="0.01" value="39.90" required onchange="updateEstimatedPrice()">
+              </div>
+            </div>
+
+            <div class="form-group full-width estimated-price-box">
+              <span>Total Estimado:</span>
+              <strong id="estimated-total-value">R$ 39,90</strong>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="hideAddItemForm()">Cancelar</button>
+          <button type="submit" class="btn btn-accent">Adicionar Item</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Custom JavaScript -->
+  <script src="app.js"></script>
+</body>
+</html>

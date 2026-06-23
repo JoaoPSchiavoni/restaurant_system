@@ -34,9 +34,9 @@ def upgrade() -> None:
     op.create_table('orders',
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('status', sa.String(), nullable=True),
-    sa.Column('user', sa.Integer(), nullable=True),
+    sa.Column('user_id', sa.Integer(), nullable=True),
     sa.Column('price', sa.Float(), nullable=True),
-    sa.ForeignKeyConstraint(['user'], ['users.id'], ),
+    sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('order_item',
@@ -45,8 +45,8 @@ def upgrade() -> None:
     sa.Column('flavor', sa.String(), nullable=True),
     sa.Column('size', sa.String(), nullable=True),
     sa.Column('unit_price', sa.Float(), nullable=True),
-    sa.Column('order', sa.Integer(), nullable=True),
-    sa.ForeignKeyConstraint(['order'], ['orders.id'], ),
+    sa.Column('order_id', sa.Integer(), nullable=True),
+    sa.ForeignKeyConstraint(['order_id'], ['orders.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     # ### end Alembic commands ###

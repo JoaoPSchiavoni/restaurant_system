@@ -1,0 +1,17 @@
+{
+  "name": "restaurant-system-frontend",
+  "version": "1.0.0",
+  "description": "Premium Node.js frontend and API gateway for the Restaurant System",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "backend": "poetry run uvicorn src.main:app --reload"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.19.2",
+    "morgan": "^1.10.0"
+  }
+}
